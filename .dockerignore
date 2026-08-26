@@ -1,0 +1,15 @@
+.git
+.github
+.gradle
+build
+.idea
+*.iml
+.vscode
+.env
+.env.*
+application-local.properties
+application-local.yml
+.coderabbit.yaml
+.gitattributes
+.gitignore
+README.md
