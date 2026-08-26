@@ -1,4 +1,4 @@
-package br.com.sementi;
+package api.sementi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
