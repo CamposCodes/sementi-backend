@@ -24,6 +24,21 @@ reviews:
   poem: false
   collapse_walkthrough: true
 
+  # Tabela "Pre-merge checks" no comentario do PR. Fica sob reviews,
+  # nao no topo -- a doc em prosa diz o contrario, o schema oficial
+  # (coderabbit.ai/integrations/schema.v2.json) e quem manda.
+  # Nada aqui agrega: titulo e descricao de PR sao escritos a mao e ja
+  # seguem padrao, e docstring nao e exigencia deste projeto.
+  pre_merge_checks:
+    title:
+      mode: "off"
+    description:
+      mode: "off"
+    docstrings:
+      mode: "off"
+    issue_assessment:
+      mode: "off"
+
   auto_review:
     enabled: true
     drafts: false
@@ -121,17 +136,3 @@ knowledge_base:
 
 chat:
   auto_reply: true
-
-# Tabela "Pre-merge checks" no comentario do PR. Nada aqui agrega:
-# titulo e descricao de PR sao escritos a mao e ja seguem padrao, e
-# docstring nao e exigencia deste projeto.
-pre_merge_checks:
-  title:
-    mode: "off"
-  description:
-    mode: "off"
-  docstrings:
-    mode: "off"
-  issue_assessment:
-    mode: "off"
-  custom_checks: []
