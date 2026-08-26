@@ -29,3 +29,10 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+// Nome fixo para o Dockerfile copiar sem glob. Sem isto o nome carrega
+// a versao, e 'gradle build' ainda gera um segundo jar (-plain.jar) --
+// dois arquivos casando com *.jar quebram o COPY da imagem.
+tasks.named('bootJar') {
+	archiveFileName = 'app.jar'
+}
