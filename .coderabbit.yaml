@@ -1,18 +1,43 @@
 # https://docs.coderabbit.ai/reference/configuration
 language: "pt-BR"
-tone_instructions: "Responda sempre em português do Brasil. Seja direto: aponte o problema e o conserto. Sem elogios, sem resumir o óbvio. Projeto solo — você é o único revisor."
+tone_instructions: "Português do Brasil. Uma frase por problema: o que está errado e o conserto. Sem preâmbulo, sem elogio, sem repetir o que o código já diz. Nada a apontar, não comente."
 early_access: false
 enable_free_tier: true
 
 reviews:
   profile: "assertive"
   request_changes_workflow: false
-  high_level_summary: true
-  review_status: true
-  sequence_diagrams: true
-  collapse_walkthrough: false
+
+  # Tudo abaixo e andaime em volta do review, nao o review. Desligado
+  # para o comentario do bot conter so o que exige acao. Sem achado,
+  # sem comentario.
+  high_level_summary: false      # a descricao do PR ja diz o que mudou
+  changed_files_summary: false   # tabela Layer/File repetindo o diff
+  sequence_diagrams: false       # diagrama mermaid em PR de infra nao informa nada
+  estimate_code_review_effort: false  # "3 (Moderate) | ~20 minutes"
+  assess_linked_issues: false
+  related_issues: false          # projeto solo, nao ha o que correlacionar
+  related_prs: false
+  suggested_reviewers: false     # nao ha outro revisor
   suggested_labels: false
+  review_status: false           # bloco de run config, quota e commits
   poem: false
+  collapse_walkthrough: true
+
+  # Tabela "Pre-merge checks" no comentario do PR. Fica sob reviews,
+  # nao no topo -- a doc em prosa diz o contrario, o schema oficial
+  # (coderabbit.ai/integrations/schema.v2.json) e quem manda.
+  # Nada aqui agrega: titulo e descricao de PR sao escritos a mao e ja
+  # seguem padrao, e docstring nao e exigencia deste projeto.
+  pre_merge_checks:
+    title:
+      mode: "off"
+    description:
+      mode: "off"
+    docstrings:
+      mode: "off"
+    issue_assessment:
+      mode: "off"
 
   auto_review:
     enabled: true
