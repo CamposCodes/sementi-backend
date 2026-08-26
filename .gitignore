@@ -19,3 +19,13 @@ gradle-app.setting
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+
+### Sementi ###
+# IntelliJ
+.idea/
+*.iml
+# Segredos (OAuth Google, credenciais de banco) — nunca versionar
+.env
+.env.*
+application-local.properties
+application-local.yml
