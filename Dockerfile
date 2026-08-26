@@ -5,21 +5,29 @@
 # https://render.com/docs/native-runtimes
 
 # ---------- build ----------
-FROM eclipse-temurin:21-jdk AS build
+# Imagem com o Gradle ja embutido em vez de JDK puro + wrapper. O
+# wrapper baixaria a distribuicao (~130 MB) a cada build sem cache,
+# com timeout de leitura de 10s -- o que ja falhou em rede lenta.
+#
+# ATENCAO: esta tag precisa acompanhar gradle/wrapper/gradle-wrapper.properties.
+# Subiu a versao do wrapper, suba aqui tambem.
+FROM gradle:9.7.1-jdk21 AS build
+
+# Estagio de build e descartado, entao root aqui nao afeta a imagem
+# final -- e evita problema de permissao de escrita em /app.
+USER root
 WORKDIR /app
 
-# Wrapper e arquivos de build antes do src/: mudanca em codigo nao
-# invalida a camada de download de dependencia.
-COPY gradlew ./
-COPY gradle ./gradle
+# Arquivos de build antes do src/: mudanca em codigo nao invalida a
+# camada de download de dependencia.
 COPY settings.gradle build.gradle ./
-RUN chmod +x gradlew && ./gradlew --no-daemon dependencies
+RUN gradle --no-daemon dependencies
 
 COPY src ./src
 # Sem teste aqui de proposito: o CI ja roda ./gradlew build com testes
 # em todo PR. Repetir no build da imagem so deixa o deploy lento e cria
 # uma segunda chance de falhar por motivo nao relacionado ao deploy.
-RUN ./gradlew --no-daemon bootJar -x test
+RUN gradle --no-daemon bootJar -x test
 
 # ---------- runtime ----------
 # JRE alpine em vez de JDK: imagem menor. Importa mais do que o normal
