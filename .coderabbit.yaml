@@ -1,0 +1,113 @@
+# https://docs.coderabbit.ai/reference/configuration
+language: "pt-BR"
+tone_instructions: "Responda sempre em português do Brasil. Seja direto: aponte o problema e o conserto. Sem elogios, sem resumir o óbvio. Projeto solo — você é o único revisor."
+early_access: false
+enable_free_tier: true
+
+reviews:
+  profile: "assertive"
+  request_changes_workflow: false
+  high_level_summary: true
+  review_status: true
+  sequence_diagrams: true
+  collapse_walkthrough: false
+  suggested_labels: false
+  poem: false
+
+  auto_review:
+    enabled: true
+    drafts: false
+    auto_incremental_review: true
+    # base_branches = branch de DESTINO do PR. main e a default e ja e revisada.
+    base_branches:
+      - "develop"
+
+  path_filters:
+    - "!**/build/**"
+    - "!**/.gradle/**"
+    - "!**/out/**"
+    - "!**/bin/**"
+    - "!**/dist/**"
+    - "!**/.idea/**"
+    - "!**/*.iml"
+    - "!**/.vscode/**"
+    - "!**/gradlew"
+    - "!**/gradlew.bat"
+    - "!**/gradle/**"
+
+  path_instructions:
+    - path: "**/*.java"
+      instructions: |
+        VOCÊ DEVE RESPONDER, GERAR RESUMOS E FAZER TODOS OS COMENTÁRIOS ESTRITAMENTE EM
+        PORTUGUÊS DO BRASIL (pt-BR). NÃO USE INGLÊS.
+
+        Atue como Tech Lead do Sementi, avaliando o código de forma rigorosa.
+
+        ## Padrões de código
+        - Métodos curtos: máximo 15 linhas. Excedeu, exija refatoração.
+        - Responsabilidade Única (SRP) obrigatória em cada método.
+        - Nomes de classes, métodos e atributos descritivos e obrigatoriamente em PORTUGUÊS.
+        - Proibido código duplicado. Exija comentário em trecho complexo (ex: Regex).
+        - PROIBIDO java.util.Date. Exija sempre java.time (LocalDate, LocalDateTime, Instant).
+        - Regras de negócio isoladas na camada Service. Controller não decide nada.
+        - Retorno para o frontend via DTO/Response. NUNCA exponha entidade JPA na API.
+        - Logger: exija Log4j2 (LogManager.getLogger). Log de erro deve incluir a causa:
+          logger.error("mensagem", e). Nunca engula exceção em catch vazio.
+
+        ## JPA
+        - Padrão de carregamento OBRIGATÓRIO: @ManyToOne(fetch = FetchType.LAZY).
+        - EVITE CascadeType.ALL como padrão. Onde aparecer, verifique o risco de exclusão
+          em massa em operação de DELETE e exija o cascade mínimo necessário.
+        - Operações de escrita (INSERT, UPDATE, DELETE) dentro de uma transação única.
+        - Aponte consulta N+1.
+
+        ## Regras de domínio do Sementi
+        - Toda entidade carrega dataInicio (criação) e dataFim (soft delete, null = ativo).
+          Consulta deve filtrar dataFim IS NULL por padrão. Aponte consulta que esqueça.
+        - Exceção: em Curtida, dataInicio/dataFim significam curtir/descurtir, não soft delete.
+          Descurtir é estado final, não alternável.
+        - O enum Nivel (FACIL, MEDIO, DIFICIL, ULTRA_DIFICIL) é definido UMA vez e compartilhado
+          entre Usuario.niveisPreferidos e Palavra.nivel. Sinalize qualquer duplicação.
+        - ULTRA_DIFICIL e criação de Categoria pessoal exigem Assinatura ativa. A validação tem
+          que ser no servidor, nunca só escondendo a opção no cliente.
+        - Categoria tem unique composto (nome, usuarioId), não nome sozinho. A colisão entre
+          categoria pessoal e categoria global precisa de validação na aplicação,
+          case-insensitive — o unique composto não pega esse caso.
+        - UsuarioPalavra tem unique (usuarioId, palavraId): uma palavra chega a um usuário no
+          máximo uma vez, para sempre, independente de dataFim.
+        - Credencial nunca no código. Client secret do OAuth e DATABASE_URL vêm de variável
+          de ambiente.
+
+        ## Stack
+        Spring Boot 4 / Spring Framework 7 / Spring Security 7. NÃO sugira API de Boot 3.x.
+
+    - path: "**/*.gradle"
+      instructions: |
+        Responda em português do Brasil.
+        - Sinalize dependência adicionada e não usada.
+        - Sinalize versão fixada à mão que deveria vir do BOM do Spring Boot.
+        - A troca de Logback (padrão do Spring Boot) por Log4j2 exige excluir
+          spring-boot-starter-logging e adicionar spring-boot-starter-log4j2. Se o código
+          usa LogManager.getLogger sem essa troca no build, aponte.
+
+    - path: ".github/workflows/**"
+      instructions: |
+        Responda em português do Brasil.
+        - Aponte action com versão de major desatualizada.
+        - Aponte segredo escrito literalmente em vez de vir de secrets.
+        - Este workflow só testa. Deploy é do Render — sinalize passo de deploy adicionado aqui.
+
+knowledge_base:
+  learnings:
+    scope: "auto"
+  linked_repositories:
+    - repository: CamposCodes/sementi-frontend
+      instructions: |
+        Frontend do Sementi: Nuxt 4 (estrutura app/), Vue 3, mobile-first, hospedado no Netlify.
+        Consome esta API. Use como contexto para julgar mudança de contrato: alteração de
+        endpoint, de formato de resposta ou de regra de sessão aqui quebra o frontend.
+        A sessão atravessa domínios (netlify.app para onrender.com), então mudança em CORS
+        ou em cookie de sessão tem impacto direto lá.
+
+chat:
+  auto_reply: true
