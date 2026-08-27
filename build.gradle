@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '4.1.1'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'com.diffplug.spotless' version '7.0.4'
 }
 
 group = 'api.sementi'
@@ -28,9 +29,13 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-actuator-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-	// H2 so para o teste de contexto subir sem banco externo. Ver
-	// src/test/resources/application.properties.
-	testRuntimeOnly 'com.h2database:h2'
+	// Postgres de verdade nos testes, no lugar do H2. E o que faz as
+	// migrations do Flyway serem executadas em todo PR e o ddl-auto=validate
+	// comparar as entidades contra o schema migrado, nao contra um schema
+	// que o H2 inventaria com outro dialeto.
+	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+	testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
+	testImplementation 'org.testcontainers:testcontainers-postgresql'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
@@ -43,4 +48,22 @@ tasks.named('test') {
 // dois arquivos casando com *.jar quebram o COPY da imagem.
 tasks.named('bootJar') {
 	archiveFileName = 'app.jar'
+}
+
+// Higiene, nao estilo. Os passos abaixo sao os portaveis do padrao ja
+// usado nos outros projetos; o formatador de la depende de um XML de
+// outra empresa. Sem um arquivo de estilo proprio do Sementi, um
+// formatador opinativo reformataria tudo com um padrao que ninguem
+// escolheu. Adicionar depois e uma linha.
+//
+// spotlessCheck entra no 'check', do qual 'build' depende - entao o CI
+// ja cobra isso sem mudanca no workflow.
+spotless {
+	java {
+		importOrder()
+		removeUnusedImports()
+		formatAnnotations()
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
 }
