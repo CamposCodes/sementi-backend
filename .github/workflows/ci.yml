@@ -19,3 +19,18 @@ jobs:
           cache: gradle
       - name: Build e testes
         run: ./gradlew build --no-daemon
+
+  # A imagem Docker e o artefato realmente deployado no Render, mas o job
+  # 'build' acima nao a constroi. Sem este job, um Dockerfile quebrado passa
+  # o CI verde e so falha no deploy - o que ja aconteceu duas vezes.
+  #
+  # Job separado e nao passo do 'build' porque roda em paralelo: o tempo
+  # total vira o do mais lento, nao a soma. So constroi, nao publica; o
+  # Render faz o proprio build.
+  docker:
+    name: docker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build da imagem
+        run: docker build -t sementi-backend:ci .

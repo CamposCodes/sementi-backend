@@ -1,0 +1,30 @@
+# Atualizacao de dependencia semanal e AGRUPADA. Sem os grupos, um bump do
+# Spring Boot vira uma duzia de PRs separadas por artefato transitivo, e o
+# resultado pratico e ninguem olhar nenhuma.
+version: 2
+updates:
+  - package-ecosystem: gradle
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      spring:
+        patterns:
+          - "org.springframework*"
+      demais:
+        patterns:
+          - "*"
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+
+  # Vigia as tags do Dockerfile: gradle:9.7.1-jdk21 e
+  # eclipse-temurin:21-jre-alpine. Atencao ao acoplamento anotado la - a tag
+  # do Gradle precisa acompanhar o gradle-wrapper.properties, entao uma PR
+  # que suba so a imagem deixa os dois divergentes.
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
