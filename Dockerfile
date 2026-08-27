@@ -33,7 +33,7 @@ RUN gradle --no-daemon bootJar -x test
 # JRE alpine em vez de JDK: imagem menor. Importa mais do que o normal
 # aqui, porque o free tier do Render dorme com ~15 min ocioso e o
 # tamanho da imagem entra direto no tempo de acordar.
-FROM eclipse-temurin:21-jre-alpine AS runtime
+FROM eclipse-temurin:25-jre-alpine AS runtime
 WORKDIR /app
 
 RUN addgroup -S sementi && adduser -S sementi -G sementi
