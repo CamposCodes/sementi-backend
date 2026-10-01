@@ -11,7 +11,7 @@
 #
 # ATENCAO: esta tag precisa acompanhar gradle/wrapper/gradle-wrapper.properties.
 # Subiu a versao do wrapper, suba aqui tambem.
-FROM gradle:9.7.1-jdk21 AS build
+FROM gradle:9.8.0-jdk21 AS build
 
 # Estagio de build e descartado, entao root aqui nao afeta a imagem
 # final -- e evita problema de permissao de escrita em /app.
